@@ -28,8 +28,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn sonar:sonar \
-            -Dsonar.projectKey=ayodejidev_adyen-java-api-library
-            -Dsonar.organization=ayodejidev \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+          mvn sonar:sonar -Dsonar.projectKey=ayodejidev_adyen-java-api-library
