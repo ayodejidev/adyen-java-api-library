@@ -21,8 +21,11 @@ jobs:
       - name: Install Dependencies
         run: mvn install
 
-      - name: Generate Coverage report
-        run: mvn clean verify
+      - name: Build and test
+        run: mvn clean test
+
+      - name: Generate coverage report
+        run: mvn test jacoco:report
 
       - name: Run SonarCloud Analysis
         env:
