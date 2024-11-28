@@ -18,9 +18,6 @@ jobs:
           java-version: 11
           distribution: 'adopt'
 
-      - name: Install Dependencies
-        run: mvn install
-
       - name: Build and test
         run: mvn clean test
 
