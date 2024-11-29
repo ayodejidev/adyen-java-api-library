@@ -1,6 +1,11 @@
 name: SonarQube CI
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   SonarCloud-Build:
