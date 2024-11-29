@@ -6,7 +6,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
-    
+
 jobs:
   build:
     name: Build and analyze
@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'zulu' # Alternative distribution options are available.
+          distribution:
       - name: Cache SonarQube Cloud packages
         uses: actions/cache@v4
         with:
