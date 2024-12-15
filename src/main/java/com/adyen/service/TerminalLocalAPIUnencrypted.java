@@ -19,6 +19,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * WARNING: This class is intended for TESTING purposes only.
@@ -27,6 +29,8 @@ import java.security.cert.X509Certificate;
  * Be sure to remove the encryption key details on the Customer Area as it will not work with encryption key details set up.
  */
 public class TerminalLocalAPIUnencrypted extends Service {
+
+    private static final Logger logger = Logger.getLogger(TerminalLocalAPIUnencrypted.class.getName());
 
     private final LocalRequest localRequest;
     private final Gson terminalApiGson;
@@ -39,7 +43,8 @@ public class TerminalLocalAPIUnencrypted extends Service {
             throw new IllegalStateException("This class is intended for TEST environment only.");
         }
 
-        System.out.println("[Warning] Using TerminalLocalAPIUnencrypted for testing unencrypted traffic.");
+        // Log a warning about the intended use of this class
+        logger.log(Level.WARNING, "Using TerminalLocalAPIUnencrypted for testing unencrypted traffic.");
 
         terminalApiGson = TerminalAPIGsonBuilder.create();
         Config config = super.getClient().getConfig();
@@ -100,6 +105,7 @@ public class TerminalLocalAPIUnencrypted extends Service {
             sc.init(null, trustAllCerts, new SecureRandom());
             return sc;
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            logger.log(Level.SEVERE, "Failed to create test SSL context with TLSv1.2", e);
             throw new RuntimeException("Failed to create test SSL context with TLSv1.2", e);
         }
     }
