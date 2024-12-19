@@ -29,11 +29,20 @@ import com.adyen.model.terminal.security.SecurityTrailer;
 import com.adyen.terminal.security.exception.NexoCryptoException;
 import org.apache.commons.codec.binary.Base64;
 
-import javax.crypto.*;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.Mac;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import static com.adyen.model.terminal.security.NexoDerivedKey.NEXO_IV_LENGTH;
 
@@ -104,11 +113,6 @@ public class NexoCrypto {
         return nexoDerivedKey;
     }
 
-    /**
-     * Encrypt or decrypt data given an IV modifier and using the specified key.
-     * <p>
-     * The actual IV is computed by taking the IV from the key material and XORing it with ivmod.
-     */
     private byte[] crypt(byte[] bytes, NexoDerivedKey dk, byte[] ivNonce, int mode)
             throws NoSuchAlgorithmException, NoSuchPaddingException,
             IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
@@ -116,7 +120,6 @@ public class NexoCrypto {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         SecretKeySpec secretKeySpec = new SecretKeySpec(dk.getCipherKey(), "AES");
 
-        // XOR dk.iv and the IV modifier
         byte[] iv = dk.getIv();
         byte[] actualIV = new byte[NEXO_IV_LENGTH];
         for (int i = 0; i < NEXO_IV_LENGTH; i++) {
@@ -128,9 +131,6 @@ public class NexoCrypto {
         return cipher.doFinal(bytes);
     }
 
-    /**
-     * Compute a HMAC using the HMAC key.
-     */
     private byte[] hmac(byte[] bytes, NexoDerivedKey derivedKey) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac mac = Mac.getInstance("HmacSHA256");
         SecretKeySpec s = new SecretKeySpec(derivedKey.getHmacKey(), "HmacSHA256");
@@ -139,9 +139,6 @@ public class NexoCrypto {
         return mac.doFinal(bytes);
     }
 
-    /**
-     * Validate the HMAC from a received message.
-     */
     private void validateHmac(byte[] receivedHmac, byte[] decryptedMessage, NexoDerivedKey derivedKey) throws NexoCryptoException, InvalidKeyException, NoSuchAlgorithmException {
         byte[] hmac = hmac(decryptedMessage, derivedKey);
         boolean valid = MessageDigest.isEqual(hmac, receivedHmac);
@@ -151,15 +148,11 @@ public class NexoCrypto {
         }
     }
 
-    /**
-     * Generate a random IV nonce with a cryptographically strong RNG.
-     */
     private byte[] generateRandomIvNonce() {
         byte[] ivNonce = new byte[NEXO_IV_LENGTH];
         try {
             secureRandom = SecureRandom.getInstance("NativePRNGNonBlocking");
         } catch (NoSuchAlgorithmException e) {
-            // Fallback to default SecureRandom implementation
             secureRandom = new SecureRandom();
         }
         secureRandom.nextBytes(ivNonce);
