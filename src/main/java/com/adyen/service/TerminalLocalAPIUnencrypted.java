@@ -27,7 +27,12 @@ import java.util.logging.Logger;
  * It must not be used in production environments.
  * This implementation is used to test unencrypted traffic over a secure channel (TLSv1.2).
  * Be sure to remove the encryption key details on the Customer Area as it will not work with encryption key details set up.
+ *
+ * @deprecated This class is deprecated because it is intended for testing purposes only and
+ *             can potentially lead to security vulnerabilities if misused.
+ *             Consider using secure alternatives in production environments.
  */
+@Deprecated
 public class TerminalLocalAPIUnencrypted extends Service {
 
     private static final Logger logger = Logger.getLogger(TerminalLocalAPIUnencrypted.class.getName());
