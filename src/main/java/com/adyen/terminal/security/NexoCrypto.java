@@ -48,7 +48,6 @@ import static com.adyen.model.terminal.security.NexoDerivedKey.NEXO_IV_LENGTH;
 
 public class NexoCrypto {
 
-    private static SecureRandom secureRandom = new SecureRandom();
     private final SecurityKey securityKey;
     private volatile NexoDerivedKey nexoDerivedKey;
 
@@ -57,7 +56,7 @@ public class NexoCrypto {
         this.securityKey = securityKey;
     }
 
-    public SaleToPOISecuredMessage encrypt(String saleToPoiMessageJson, MessageHeader messageHeader) throws Exception {
+    public SaleToPOISecuredMessage encrypt(String saleToPoiMessageJson, MessageHeader messageHeader) throws GeneralSecurityException {
         NexoDerivedKey derivedKey = getNexoDerivedKey();
         byte[] saleToPoiMessageByteArray = saleToPoiMessageJson.getBytes(StandardCharsets.UTF_8);
         byte[] ivNonce = generateRandomIvNonce();
@@ -79,7 +78,7 @@ public class NexoCrypto {
         return saleToPoiSecuredMessage;
     }
 
-    public String decrypt(SaleToPOISecuredMessage saleToPoiSecuredMessage) throws Exception {
+    public String decrypt(SaleToPOISecuredMessage saleToPoiSecuredMessage) throws GeneralSecurityException, NexoCryptoException {
         NexoDerivedKey derivedKey = getNexoDerivedKey();
         byte[] encryptedSaleToPoiMessageByteArray = Base64.decodeBase64(saleToPoiSecuredMessage.getNexoBlob().getBytes());
         byte[] ivNonce = saleToPoiSecuredMessage.getSecurityTrailer().getNonce();
@@ -150,6 +149,7 @@ public class NexoCrypto {
 
     private byte[] generateRandomIvNonce() {
         byte[] ivNonce = new byte[NEXO_IV_LENGTH];
+        SecureRandom secureRandom;
         try {
             secureRandom = SecureRandom.getInstance("NativePRNGNonBlocking");
         } catch (NoSuchAlgorithmException e) {
