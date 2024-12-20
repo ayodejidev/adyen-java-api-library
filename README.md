@@ -486,29 +486,26 @@ When using Attachments, ensure content is provided as a byte array. It's importa
 
 ## Using the Local Terminal API Integration without Encryption (Only on TEST)
 If you wish to develop the Local Terminal API integration parallel to your encryption implementation, you can opt for the unencrypted version. Be sure to remove any encryption details from the CA terminal config page.
+
 ```java
 // Step 1: Import the required classes
-import com.adyen.service.TerminalLocalAPIUnencrypted;
-import com.adyen.model.nexo.*;
-import com.adyen.model.terminal.*;
-import javax.net.ssl.SSLContext;
 
 // Step 2: Add your Certificate Path and Local Endpoint to the config path.
-Client client = new Client();
-client.getConfig().setTerminalApiLocalEndpoint("The IP of your terminal (eg https://192.168.47.169)");
-client.getConfig().setEnvironment(Environment.TEST);
+Client client=new Client();
+        client.getConfig().setTerminalApiLocalEndpoint("The IP of your terminal (eg https://192.168.47.169)");
+        client.getConfig().setEnvironment(Environment.TEST);
 
 // Optionally: verify the certificate, the library will ignore this validation when set to null (!!)
-client.getConfig().setSSLContext(sslContext);
+        client.getConfig().setSSLContext(sslContext);
 
 // Step 3 Initialize the client and the API objects;
-TerminalLocalAPIUnencrypted terminalLocalAPIUnencrypted = new TerminalLocalAPIUnencrypted(client);
+        TerminalLocalAPIUnencrypted terminalLocalAPIUnencrypted=new TerminalLocalAPIUnencrypted(client);
 
 // Step 4: Create the request object
-TerminalAPIRequest terminalAPIPaymentRequest = ///....same as the one used in the other examples;
+        TerminalAPIRequest terminalAPIPaymentRequest= ///....same as the one used in the other examples;
 
 // Step 5: Make the request
-TerminalAPIResponse terminalAPIResponse = terminalLocalAPIUnencrypted.request(terminalAPIPaymentRequest);
+        TerminalAPIResponse terminalAPIResponse=terminalLocalAPIUnencrypted.request(terminalAPIPaymentRequest);
 ```
 
 
