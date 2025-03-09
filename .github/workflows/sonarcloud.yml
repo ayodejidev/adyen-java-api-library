@@ -1,47 +1,30 @@
 name: Sonarcloud CI
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    types: [ opened, synchronize, reopened ]
+  schedule:
+    - cron: '0 0 * * 4'
+  workflow_dispatch: {}
 
 jobs:
-  SonarCloud-Build:
-    name: SonarCloud Build
+  java-sonarqube:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: 'zulu'
-      - name: Cache SonarQube Cloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          java-version: '17'
+          distribution: 'adopt'
       - name: Cache Maven packages
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-
-      - name: Run Checkstyle
-        run: mvn checkstyle:check
-
-      - name: Generate coverage report
-        run: mvn test jacoco:report
-
-      - name: Run SonarCloud Analysis
-        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+      - name: SonarQube Scan
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn sonar:sonar -Dsonar.projectKey=Adyen_adyen-java-api-library
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ayodejidev_adyen-java-api-library2 --no-transfer-progress
