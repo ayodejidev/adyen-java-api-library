@@ -27,4 +27,4 @@ jobs:
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ayodejidev_adyen-java-api-library2 --no-transfer-progress
+        run: mvn mvn sonar:sonar -Dsonar.projectKey=ayodejidev_adyen-java-api-library2 --no-transfer-progress
